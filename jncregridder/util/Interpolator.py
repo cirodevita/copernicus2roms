@@ -157,13 +157,6 @@ def vertical_interp(dstLevs, srcEta, srcXi, tSrc, srcZ, dstZ, dstMask):
                 target_z_levels = np.flip(dstZ[:, j, k])
                 tDst[:, j, k] = np.flip(interpolator(target_z_levels))
 
-                if j == 0 and k == 0:
-                    print("z_levels", z_levels)
-                    print("original vertical profile", np.flip(vertical_profile))
-                    print("\n\n\n")
-                    print("sigma_levels", target_z_levels)
-                    print("interpolated vertical profile", tDst[:, j, k])
-
     return tDst
 
 
