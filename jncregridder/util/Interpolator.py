@@ -1,20 +1,9 @@
 from scipy.interpolate import griddata, interp1d
 from concurrent.futures import ProcessPoolExecutor
 from numpy.ma.core import MaskedArray
-from numba import jit, types
-from numba.experimental import jitclass
+from numba import jit
 import numpy as np
 import multiprocessing
-
-
-@jitclass([('w', types.float64[:]),
-           ('KK', types.int32[:]),
-           ('masked', types.boolean)])
-class Weight3DStruct:
-    def __init__(self):
-        self.w = np.zeros(2, dtype=np.float64)
-        self.KK = np.zeros(2, dtype=np.int32)
-        self.masked = False
 
 
 def gridInterp(srcLAT, srcLON, values, dstLAT, dstLON, fillValue, method):
@@ -140,7 +129,7 @@ def interp_horizontal(k, srcLAT, srcLON, srcZ, values, dstLAT, dstLON, dstMask, 
 
 # @jit(nopython=True)
 def vertical_interp(dstLevs, srcEta, srcXi, tSrc, srcZ, dstZ, dstMask):
-    tDst = np.full((dstLevs, srcEta, srcXi), np.nan)
+    tDst = np.full((dstLevs, srcEta, srcXi), 1e37)
     for j in range(srcEta):
         for k in range(srcXi):
             if dstMask[j, k] == 1:
