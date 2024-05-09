@@ -127,24 +127,22 @@ def interp_horizontal(k, srcLAT, srcLON, srcZ, values, dstLAT, dstLON, dstMask, 
     return result
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def vertical_interp(dstLevs, srcEta, srcXi, tSrc, srcZ, dstZ, dstMask):
     tDst = np.full((dstLevs, srcEta, srcXi), 1e37)
-    for j in range(srcEta):
-        for k in range(srcXi):
-            if dstMask[j, k] == 1:
-                vertical_profile = tSrc[:, j, k]
-                first_nan_index = -1
-                if np.isnan(vertical_profile).any():
-                    first_nan_index = np.argmax(np.isnan(vertical_profile))
+    mask_indices = np.where(dstMask == 1)
 
-                vertical_profile = tSrc[:first_nan_index, j, k]
-                z_levels = -np.array(srcZ[:first_nan_index])
+    for i, j in zip(*mask_indices):
+        vertical_profile = tSrc[:, i, j]
+        first_nan_index = -1
+        if np.isnan(vertical_profile).any():
+            first_nan_index = np.argmax(np.isnan(vertical_profile))
 
-                interpolator = interp1d(z_levels, vertical_profile, kind='linear', bounds_error=False,
-                                        fill_value="extrapolate")
-                target_z_levels = np.flip(dstZ[:, j, k])
-                tDst[:, j, k] = np.flip(interpolator(target_z_levels))
+        vertical_profile = tSrc[:first_nan_index, i, j][::-1]
+        z_levels = -np.array(srcZ[:first_nan_index])[::-1]
+
+        target_z_levels = dstZ[:, i, j]
+        tDst[:, i, j] = np.interp(target_z_levels, z_levels, vertical_profile)
 
     return tDst
 
