@@ -148,12 +148,24 @@ def vertical_interp(dstLevs, srcEta, srcXi, tSrc, srcZ, dstZ, dstMask):
 
 
 class Interpolator:
-    def __init__(self, srcLAT, srcLON, dstLAT, dstLON, dstMASK, method="linear"):
+    def __init__(self, srcLAT, srcLON, dstLAT, dstLON, dstMASK=None, method="linear"):
         self.srcLAT = srcLAT
         self.srcLON = srcLON
-        self.dstLAT = dstLAT.filled(np.nan)
-        self.dstLON = dstLON.filled(np.nan)
-        self.dstMASK = dstMASK.filled(np.nan)
+        if isinstance(self.srcLAT, MaskedArray):
+            self.srcLAT = srcLAT.filled(np.nan)
+        if isinstance(self.srcLON, MaskedArray):
+            self.srcLON = srcLON.filled(np.nan)
+
+        self.dstLAT = dstLAT
+        self.dstLON = dstLON
+        if isinstance(self.dstLAT, MaskedArray):
+            self.dstLAT = dstLAT.filled(np.nan)
+        if isinstance(self.dstLON, MaskedArray):
+            self.dstLON = dstLON.filled(np.nan)
+
+        if dstMASK is not None:
+            self.dstMASK = dstMASK.filled(np.nan)
+        
         self.method = method
 
         self.dstSNDim = len(dstLAT)
