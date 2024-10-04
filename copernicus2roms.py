@@ -32,22 +32,22 @@ def getModSimStartDate(ncepDate):
     return dModSimStartDate
 
 
-class MyOcean2ROMS:
+class Copernicus2ROMS:
     def __init__(self, gridPath, dataPath, ncepDate, initPath, boundaryPath):
         # Path to the ROMS grid
         self.romsGridPath = gridPath
 
-        # Path to the MyOcean current copernicus-data
-        self.myOceanPathCur = os.path.join(dataPath, f"myoc_d00_{ncepDate}_cur.nc")
+        # Path to the copernicus current copernicus-data
+        self.copernicusPathCur = os.path.join(dataPath, f"myoc_d00_{ncepDate}_cur.nc")
 
-        # Path to the MyOcean temperature copernicus-data
-        self.myOceanPathTem = os.path.join(dataPath, f"myoc_d00_{ncepDate}_tem.nc")
+        # Path to the copernicus temperature copernicus-data
+        self.copernicusPathTem = os.path.join(dataPath, f"myoc_d00_{ncepDate}_tem.nc")
 
-        # Path to the MyOcean salinity copernicus-data
-        self.myOceanPathSal = os.path.join(dataPath, f"myoc_d00_{ncepDate}_sal.nc")
+        # Path to the copernicus salinity copernicus-data
+        self.copernicusPathSal = os.path.join(dataPath, f"myoc_d00_{ncepDate}_sal.nc")
 
-        # Path to the MyOcean sea surface height copernicus-data
-        self.myOceanPathSSH = os.path.join(dataPath, f"myoc_d00_{ncepDate}_ssh.nc")
+        # Path to the copernicus sea surface height copernicus-data
+        self.copernicusPathSSH = os.path.join(dataPath, f"myoc_d00_{ncepDate}_ssh.nc")
 
         # Path to the output init file
         self.romsInitPath = initPath
@@ -109,10 +109,10 @@ class MyOcean2ROMS:
         print("ANGLE:", ANGLE.shape)
         print("Z:", romsZ.shape)
 
-        dataTem = CopernicusTem(self.myOceanPathTem)
-        dataSal = CopernicusSal(self.myOceanPathSal)
-        dataSSH = CopernicusSSH(self.myOceanPathSSH)
-        dataCur = CopernicusCur(self.myOceanPathCur)
+        dataTem = CopernicusTem(self.copernicusPathTem)
+        dataSal = CopernicusSal(self.copernicusPathSal)
+        dataSSH = CopernicusSSH(self.copernicusPathSSH)
+        dataCur = CopernicusCur(self.copernicusPathCur)
 
         # LON at XY points
         # LATXY = dataCur.LAT
@@ -120,7 +120,7 @@ class MyOcean2ROMS:
         LONXY, LATXY = np.meshgrid(dataCur.LON, dataCur.LAT)
         LATXY = LATXY.filled(np.nan)
         LONXY = LONXY.filled(np.nan)
-        myOceanZ = dataCur.Z
+        copernicusZ = dataCur.Z
 
         # Set the number of forcing time steps
         forcingTimeSteps = len(dataCur.TIME)
@@ -170,11 +170,11 @@ class MyOcean2ROMS:
             SSH_ROMS = bilinearInterpolatorRho.interp(valuesSSH, dataSSH.FillValue)
 
             # Create a 3D bilinear interpolator on Rho points
-            interpolator3DRho = BilinearInterpolator3D(LATXY, LONXY, myOceanZ, LATRHO, LONRHO, romsZ, MASKRHO, romsGrid)
+            interpolator3DRho = BilinearInterpolator3D(LATXY, LONXY, copernicusZ, LATRHO, LONRHO, romsZ, MASKRHO, romsGrid)
             # Create a 3D bilinear interpolator on U points
-            interpolator3DU = BilinearInterpolator3D(LATXY, LONXY, myOceanZ, LATU, LONU, romsZ, MASKU, romsGrid)
+            interpolator3DU = BilinearInterpolator3D(LATXY, LONXY, copernicusZ, LATU, LONU, romsZ, MASKU, romsGrid)
             # Create a 3D bilinear interpolator on V points
-            interpolator3DV = BilinearInterpolator3D(LATXY, LONXY, myOceanZ, LATV, LONV, romsZ, MASKV, romsGrid)
+            interpolator3DV = BilinearInterpolator3D(LATXY, LONXY, copernicusZ, LATV, LONV, romsZ, MASKV, romsGrid)
 
             print("Interpolating SAL")
             SAL_ROMS = interpolator3DRho.interp(valuesSal, dataSal.FillValue)
@@ -221,7 +221,7 @@ class MyOcean2ROMS:
 
 
 def parser():
-    parser = argparse.ArgumentParser(description="MyOcean2ROMS")
+    parser = argparse.ArgumentParser(description="Copernicus2ROMS")
     parser.add_argument("--gridPath", type=str, required=True, help="Path to grid copernicus-data file")
     parser.add_argument("--dataPath", type=str, required=True, help="Path to general copernicus-data directory")
     parser.add_argument("--ncepDate", type=str, required=True,help="Date for NCEP copernicus-data")
@@ -235,7 +235,7 @@ def main():
     args = arg_parser.parse_args()
 
     start = time.time()
-    MyOcean2ROMS(args.gridPath, args.dataPath, args.ncepDate, args.initPath, args.boundaryPath)
+    Copernicus2ROMS(args.gridPath, args.dataPath, args.ncepDate, args.initPath, args.boundaryPath)
     end = time.time() - start
 
     print(f"Execution time: {end}\n")
