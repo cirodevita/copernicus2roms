@@ -33,7 +33,7 @@ class ROMSBoundary:
         self.dimEtaV = self.ncfWritable.createDimension(romsGrid.dimEtaV.name, len(romsGrid.dimEtaV))
         self.dimXiV = self.ncfWritable.createDimension(romsGrid.dimXiV.name, len(romsGrid.dimXiV))
         self.dimSRho = self.ncfWritable.createDimension('s_rho', len(romsGrid.s_rho))
-        self.dimSw = self.ncfWritable.createDimension('s_w', len(romsGrid.s_w))
+        # self.dimSw = self.ncfWritable.createDimension('s_w', len(romsGrid.s_w))
 
         self.dimOceanTime = self.ncfWritable.createDimension('ocean_time', forcingTimeSteps)
 
@@ -69,23 +69,23 @@ class ROMSBoundary:
         self.hc.long_name = "S-coordinate parameter, critical depth"
         self.hc.units = "meter"
 
-        self.Cs_w = self.ncfWritable.createVariable("Cs_w", np.double, ("s_w",))
-        self.Cs_w.long_name = "S-coordinate stretching curves at W-points"
-        self.Cs_w.valid_min = -1
-        self.Cs_w.valid_max = 0
-        self.Cs_w.field = "s_w, scalar"
+        # self.Cs_w = self.ncfWritable.createVariable("Cs_w", np.double, ("s_w",))
+        # self.Cs_w.long_name = "S-coordinate stretching curves at W-points"
+        # self.Cs_w.valid_min = -1
+        # self.Cs_w.valid_max = 0
+        # self.Cs_w.field = "s_w, scalar"
 
         self.Cs_r = self.ncfWritable.createVariable("Cs_r", np.double, ("s_rho",))
         self.Cs_r.long_name = "S-coordinate stretching curves at RHO-points"
         self.Cs_r.units = "nondimensional"
 
-        self.s_w = self.ncfWritable.createVariable("s_w", np.double, ("s_w",))
-        self.s_w.long_name = "S-coordinate at W-points"
-        self.s_w.valid_min = -1
-        self.s_w.valid_max = 0
-        self.s_w.standard_name = "ocean_s_coordinate_g1"
-        self.s_w.formula_terms = "s: s_w C: Cs_w eta: zeta depth: h depth_c: hc"
-        self.s_w.field = "s_w, scalar"
+        # self.s_w = self.ncfWritable.createVariable("s_w", np.double, ("s_w",))
+        # self.s_w.long_name = "S-coordinate at W-points"
+        # self.s_w.valid_min = -1
+        # self.s_w.valid_max = 0
+        # self.s_w.standard_name = "ocean_s_coordinate_g1"
+        # self.s_w.formula_terms = "s: s_w C: Cs_w eta: zeta depth: h depth_c: hc"
+        # self.s_w.field = "s_w, scalar"
 
         self.sc_r = self.ncfWritable.createVariable("sc_r", np.double, ("s_rho",))
         self.sc_r.long_name = "S-coordinate at RHO-points"

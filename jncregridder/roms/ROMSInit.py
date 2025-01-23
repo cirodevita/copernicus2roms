@@ -140,6 +140,8 @@ class ROMSInit:
         self.theta_s.units = 'nondimensional'
 
         self.Tcline = self.ncfWritable.createVariable('Tcline', np.float64, ('one',))
+        self.Tcline.long_name = "S-coordinate surface/bottom layer width"
+        self.Tcline.units = 'meter'
 
         self.ocean_time = self.ncfWritable.createVariable('ocean_time', np.float64, ('ocean_time',))
         self.ocean_time.long_name = 'ocean forcing time'
@@ -161,23 +163,22 @@ class ROMSInit:
         self.Cs_r = self.ncfWritable.createVariable('Cs_r', np.float64, ('s_rho',))
         self.Cs_r.long_name = 'S-coordinate stretching curves at RHO-points'
         self.Cs_r.units = 'nondimensional'
+        self.Cs_r.valid_min = -1.0
+        self.Cs_r.valid_max = 0.0
+        self.Cs_r.field = 'Cs_r, scalar'
 
         self.sc_r = self.ncfWritable.createVariable('sc_r', np.float64, ('s_rho',))
         self.sc_r.long_name = 'S-coordinate at RHO-points'
         self.sc_r.units = 'nondimensional'
+        self.sc_r.valid_min = -1.0
+        self.sc_r.valid_max = 0.0
+        self.sc_r.field = 'sc_r, scalar'
 
-        self.s_rho = self.ncfWritable.createVariable('s_rho', np.float64, ('s_rho',))
-        self.s_rho.long_name = 'oS-coordinate at RHO-points'
-        self.s_rho.valid_min = -1.0
-        self.s_rho.valid_max = 0.0
-        self.s_rho.positive = 'up'
-        self.s_rho.standard_name = 'ocean_s_coordinate_g1'
-        self.s_rho.formula_terms = ''
-        self.s_rho.field = 's_rho, scalar'
-        self.s_rho._CoordinateTransformType = 'Vertical'
-        self.s_rho._CoordinateAxes = 's_rho'
-        self.s_rho._CoordinateAxisType = 'GeoZ'
-        self.s_rho._CoordinateZisPositive = 'up'
+        self.vtransform = self.ncfWritable.createVariable('Vtransform', np.float64, ('one',))
+        self.vtransform.long_name = 'vertical terrain-following transformation equation'
+
+        self.vstretching = self.ncfWritable.createVariable('Vstretching', np.float64, ('one',))
+        self.vstretching.long_name = 'vertical terrain-following stretching function'
 
     def make(self):
         one = len(self.dimOne)
@@ -194,14 +195,16 @@ class ROMSInit:
         self.theta_b[:] = self.romsGrid.theta_b
         self.tend[:] = np.zeros(one)
         self.Tcline[:] = self.romsGrid.TCLINE
+        self.vtransform[:] = self.romsGrid.vtransform
+        self.vstretching[:] = self.romsGrid.vstretching
 
         self.ocean_time[:] = self.OCEAN_TIME
         self.scrum_time[:] = self.SCRUM_TIME
 
         self.sc_r[:] = self.romsGrid.s_rho
-        self.s_rho[:] = self.romsGrid.s_rho
-        self.hc[:] = self.romsGrid.HC
         self.Cs_r[:] = self.romsGrid.cs_r
+
+        self.hc[:] = self.romsGrid.HC
 
     def write(self, time):
         self.u[time] = self.U
