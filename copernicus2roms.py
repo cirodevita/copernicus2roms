@@ -33,7 +33,7 @@ def getModSimStartDate(ncepDate):
 
 
 class Copernicus2ROMS:
-    def __init__(self, gridPath, dataPath, ncepDate, initPath, boundaryPath):
+    def __init__(self, gridPath, dataPath, ncepDate, initPath, boundaryPath, vtransform, vstretching, theta_b, theta_s, Tcline, N):
         # Path to the ROMS grid
         self.romsGridPath = gridPath
 
@@ -56,7 +56,7 @@ class Copernicus2ROMS:
         self.romsBoundaryPath = boundaryPath
 
         # Open ROMS grid copernicus-data
-        romsGrid = ROMSGrid(gridPath)
+        romsGrid = ROMSGrid(gridPath, vtransform, vstretching, theta_b, theta_s, Tcline, N)
 
         # Get dimension size
         etaRho = romsGrid.etaRho
@@ -227,6 +227,12 @@ def parser():
     parser.add_argument("--ncepDate", type=str, required=True,help="Date for NCEP copernicus-data")
     parser.add_argument("--initPath", type=str, required=True, help="Path to store initial copernicus-data file")
     parser.add_argument("--boundaryPath", type=str, required=True, help="Path to store boundary copernicus-data file")
+    parser.add_argument("--vtransform", type=int, default=2, help="Vertical transformation parameter (default: 2)")
+    parser.add_argument("--vstretching", type=int, default=4, help="Vertical stretching parameter (default: 4)")
+    parser.add_argument("--theta_b", type=float, default=0.4, help="Bottom slope parameter (default: 0.4)")
+    parser.add_argument("--theta_s", type=float, default=3.0, help="Surface slope parameter (default: 3.0)")
+    parser.add_argument("--Tcline", type=float, default=25, help="Critical depth (default: 25)")
+    parser.add_argument("--N", type=int, default=30, help="Number of vertical levels (default: 30)")
     return parser
 
 
@@ -235,7 +241,7 @@ def main():
     args = arg_parser.parse_args()
 
     start = time.time()
-    Copernicus2ROMS(args.gridPath, args.dataPath, args.ncepDate, args.initPath, args.boundaryPath)
+    Copernicus2ROMS(args.gridPath, args.dataPath, args.ncepDate, args.initPath, args.boundaryPath, args.vtransform, args.vstretching, args.theta_b, args.theta_s, args.Tcline, args.N)
     end = time.time() - start
 
     print(f"Execution time: {end}\n")
